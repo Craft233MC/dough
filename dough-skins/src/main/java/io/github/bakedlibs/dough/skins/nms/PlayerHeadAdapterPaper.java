@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 public class PlayerHeadAdapterPaper implements PlayerHeadAdapter {
     private final Method getName;
     private final Method getValue;
