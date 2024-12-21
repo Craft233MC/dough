@@ -54,13 +54,13 @@ public class TaskQueue {
             if (node.getDelay() > 0) {
                 foliaLib.getScheduler().runLaterAsync(runnable, node.getDelay());
             } else {
-                foliaLib.getScheduler().runLaterAsync(runnable,0);
+                foliaLib.getScheduler().runAsync(wrappedTask -> runnable.run());
             }
         } else {
             if (node.getDelay() > 0) {
                 foliaLib.getScheduler().runLater(runnable, node.getDelay());
             } else {
-                foliaLib.getScheduler().runLater(runnable, 0);
+                foliaLib.getScheduler().runNextTick(wrappedTask -> runnable.run());
             }
         }
     }

@@ -78,7 +78,7 @@ class ChatInputListener implements Listener {
                 if (handler.test(msg)) {
                     iterator.remove();
                     FoliaLib foliaLib = new FoliaLib(plugin);
-                    foliaLib.getScheduler().runLater(() -> handler.onChat(p,msg),0);
+                    foliaLib.getScheduler().runNextTick(wrappedTask -> handler.onChat(p,msg));
                     e.setCancelled(true);
                     return;
                 }

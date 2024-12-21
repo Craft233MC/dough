@@ -79,7 +79,7 @@ abstract class AbstractPluginUpdater<V extends Version> implements PluginUpdater
 
     protected void scheduleAsyncUpdateTask(@Nonnull UpdaterTask<V> task) {
         FoliaLib foliaLib = new FoliaLib(plugin);
-        foliaLib.getScheduler().runLater(task,0);
+        foliaLib.getScheduler().runNextTick(wrappedTask -> task.run());
     }
 
     @ParametersAreNonnullByDefault
