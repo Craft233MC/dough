@@ -5,6 +5,7 @@ import java.util.function.IntConsumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.tcoded.folialib.FoliaLib;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -48,18 +49,18 @@ public class TaskQueue {
             node.execute(index);
             run(plugin, node.getNextNode(), index + 1);
         };
-
+        FoliaLib foliaLib = new FoliaLib(plugin);
         if (node.isAsynchronous()) {
             if (node.getDelay() > 0) {
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, node.getDelay());
+                foliaLib.getScheduler().runLaterAsync(runnable, node.getDelay());
             } else {
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+                foliaLib.getScheduler().runLaterAsync(runnable,0);
             }
         } else {
             if (node.getDelay() > 0) {
-                Bukkit.getScheduler().runTaskLater(plugin, runnable, node.getDelay());
+                foliaLib.getScheduler().runLater(runnable, node.getDelay());
             } else {
-                Bukkit.getScheduler().runTask(plugin, runnable);
+                foliaLib.getScheduler().runLater(runnable, 0);
             }
         }
     }

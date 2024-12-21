@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.tcoded.folialib.FoliaLib;
 import org.bukkit.plugin.Plugin;
 
 import com.google.gson.JsonArray;
@@ -102,8 +103,8 @@ public class PlayerSkin {
     public static @Nonnull CompletableFuture<PlayerSkin> fromPlayerUUID(Plugin plugin, UUID uuid) {
         CompletableFuture<PlayerSkin> future = new CompletableFuture<>();
         DoughLogger logger = new DoughLogger(plugin.getServer(), "skins");
-
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        FoliaLib foliaLib = new FoliaLib(plugin);
+        foliaLib.getScheduler().runAsync(wrappedTask -> {
             String targetUrl = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false";
 
             try (InputStreamReader reader = new InputStreamReader(new URL(targetUrl).openStream(), StandardCharsets.UTF_8)) {

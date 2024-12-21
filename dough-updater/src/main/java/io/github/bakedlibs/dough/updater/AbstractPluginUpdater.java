@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.tcoded.folialib.FoliaLib;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -77,7 +78,8 @@ abstract class AbstractPluginUpdater<V extends Version> implements PluginUpdater
     }
 
     protected void scheduleAsyncUpdateTask(@Nonnull UpdaterTask<V> task) {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
+        FoliaLib foliaLib = new FoliaLib(plugin);
+        foliaLib.getScheduler().runLater(task,0);
     }
 
     @ParametersAreNonnullByDefault

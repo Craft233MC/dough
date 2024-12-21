@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.tcoded.folialib.FoliaLib;
 import org.apache.commons.lang.Validate;
 import org.bukkit.plugin.Plugin;
 
@@ -95,8 +96,8 @@ public class UUIDLookup {
 
         CompletableFuture<UUID> future = new CompletableFuture<>();
         DoughLogger logger = new DoughLogger(plugin.getServer(), "skins");
-
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        FoliaLib foliaLib = new FoliaLib(plugin);
+        foliaLib.getScheduler().runAsync(wrappedTask -> {
             String targetUrl = "https://api.mojang.com/users/profiles/minecraft/" + name;
 
             try (InputStreamReader reader = new InputStreamReader(new URL(targetUrl).openStream(), StandardCharsets.UTF_8)) {
@@ -124,5 +125,4 @@ public class UUIDLookup {
 
         return future;
     }
-
 }

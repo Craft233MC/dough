@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.tcoded.folialib.FoliaLib;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -54,8 +56,9 @@ class ChatInputListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onChat(AsyncPlayerChatEvent e) {
-        checkInput(e, e.getPlayer(), e.getMessage());
+    public void onChat(AsyncChatEvent e) {
+        String message = PlainTextComponentSerializer.plainText().serialize(e.message());
+        checkInput(e, e.getPlayer(), message);
     }
 
     @EventHandler
@@ -74,8 +77,8 @@ class ChatInputListener implements Listener {
 
                 if (handler.test(msg)) {
                     iterator.remove();
-                    plugin.getServer().getScheduler().runTask(plugin, () -> handler.onChat(p, msg));
-
+                    FoliaLib foliaLib = new FoliaLib(plugin);
+                    foliaLib.getScheduler().runLater(() -> handler.onChat(p,msg),0);
                     e.setCancelled(true);
                     return;
                 }
