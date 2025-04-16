@@ -44,12 +44,8 @@ jobs:
         rm -rf original*
         echo "FILE=$(ls | grep .jar )" >> $GITHUB_ENV
 
-    - name: Automatic Releases
-      uses: marvinpinto/action-automatic-releases@v1.2.1
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: "CI Build"
-        files: |
-          ${{ env.FILE }}
+        name: ${{ env.FILE }}
+        path: dough-api/target/${{ env.FILE }}
