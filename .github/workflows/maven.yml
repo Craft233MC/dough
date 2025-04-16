@@ -37,8 +37,12 @@ jobs:
     - name: Build with Maven
       run: mvn package --file pom.xml
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+    - name: Automatic Releases
+      uses: marvinpinto/action-automatic-releases@v1.2.1
       with:
-        name: dough-api-1.3.1-SNAPSHOT.jar
-        path: dough-api/target/dough-api-1.3.1-SNAPSHOT.jar
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "CI Build"
+        files: |
+          dough-api/target/dough-api-*-SNAPSHOT.jar
