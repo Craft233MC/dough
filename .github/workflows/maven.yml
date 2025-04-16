@@ -37,6 +37,13 @@ jobs:
     - name: Build with Maven
       run: mvn package --file pom.xml
 
+    - name: clear target folder and select file
+      run: |
+        cd dough-api/target/
+        rm -rf dough-api-*-sources.jar
+        rm -rf original*
+        echo "FILE=$(ls | grep .jar )" >> $GITHUB_ENV
+
     - name: Automatic Releases
       uses: marvinpinto/action-automatic-releases@v1.2.1
       with:
@@ -45,4 +52,4 @@ jobs:
         prerelease: true
         title: "CI Build"
         files: |
-          dough-api/target/dough-api-*-SNAPSHOT.jar
+          ${{ env.FILE }}
