@@ -3,10 +3,10 @@ name: Maven build
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
   workflow_dispatch:
 
 jobs:
@@ -18,34 +18,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3.5.3
+      - name: Checkout repository
+        uses: actions/checkout@v3.5.3
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3.11.0
-      with:
-        java-version: '17'
-        distribution: 'zulu'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3.11.0
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          java-package: jdk
+          architecture: x64
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-    - name: Build with Maven
-      run: mvn package --file pom.xml
+      - name: Build with Maven
+        run: mvn package --file pom.xml
 
-    - name: clear target folder and select file
-      run: |
-        cd dough-api/target/
-        rm -rf dough-api-*-sources.jar
-        rm -rf original*
-        echo "FILE=$(ls | grep .jar )" >> $GITHUB_ENV
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.FILE }}
-        path: dough-api/target/${{ env.FILE }}
+      - name: Publish dough
+        if: github.event_name != 'pull_request'
+        run: mvn -s .mvn/settings.xml -B deploy --file pom.xml --errors
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_ACCOUNT: ${{ secrets.MAVEN_ACCOUNT }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}

@@ -38,15 +38,13 @@
 
     <distributionManagement>
         <repository>
-            <id>gugu-maven-repo</id>
-            <name>Gugu Maven Release Repository</name>
-            <url>https://maven.norain.city/releases</url>
+            <id>neokoni-repo</id>
+            <url>https://repo.neokoni.ink/releases</url>
         </repository>
 
         <snapshotRepository>
-            <id>gugu-maven-repo</id>
-            <name>Gugu Maven Snapshot Repository</name>
-            <url>https://maven.norain.city/snapshots</url>
+            <id>neokoni-repo</id>
+            <url>https://repo.neokoni.ink/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
