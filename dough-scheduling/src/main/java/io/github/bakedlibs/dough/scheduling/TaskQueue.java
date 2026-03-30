@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.tcoded.folialib.FoliaLib;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -56,6 +56,12 @@ public class TaskQueue {
             } else {
                 foliaLib.getScheduler().runAsync(wrappedTask -> runnable.run());
             }
+        } if (node.getLocation() != null) {
+            if (node.getDelay() > 0) {
+                foliaLib.getScheduler().runAtLocationLater(node.getLocation(), runnable, node.getDelay());
+            } else {
+                foliaLib.getScheduler().runAtLocation(node.getLocation(), wrappedTask -> runnable.run());
+            }
         } else {
             if (node.getDelay() > 0) {
                 foliaLib.getScheduler().runLater(runnable, node.getDelay());
@@ -80,6 +86,21 @@ public class TaskQueue {
 
     /**
      * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
+     * Use the {@link Integer} parameter in your {@link IntConsumer} to determine the task's index.
+     *
+     * @param location
+     *            The location where the task should be run at.
+     * @param consumer
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRun(@Nonnull Location location, @Nonnull IntConsumer consumer) {
+        return append(new TaskNode(location, consumer, false));
+    }
+
+    /**
+     * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
      * 
      * @param runnable
      *            The callback to run
@@ -88,6 +109,20 @@ public class TaskQueue {
      */
     public @Nonnull TaskQueue thenRun(@Nonnull Runnable runnable) {
         return thenRun(i -> runnable.run());
+    }
+
+    /**
+     * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
+     *
+     * @param location
+     *           The location where the task should be run at.
+     * @param runnable
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRun(@Nonnull Location location, @Nonnull Runnable runnable) {
+        return thenRun(location, i -> runnable.run());
     }
 
     /**
@@ -136,6 +171,27 @@ public class TaskQueue {
 
     /**
      * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
+     * Use the {@link Integer} parameter in your {@link IntConsumer} to determine the task's index.
+     *
+     * @param location
+     *           The location where the task should be run at.
+     * @param ticks
+     *            The time to wait before running this task after the previous one.
+     * @param consumer
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRun(@Nonnull Location location, int ticks, @Nonnull IntConsumer consumer) {
+        if (ticks < 1) {
+            throw new IllegalArgumentException("thenAfter() must be given a time that is greater than zero!");
+        }
+
+        return append(new TaskNode(location, consumer, ticks, false));
+    }
+
+    /**
+     * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
      * 
      * @param ticks
      *            The time to wait before running this task after the previous one.
@@ -146,6 +202,22 @@ public class TaskQueue {
      */
     public @Nonnull TaskQueue thenRun(int ticks, @Nonnull Runnable runnable) {
         return thenRun(ticks, i -> runnable.run());
+    }
+
+    /**
+     * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
+     *
+     * @param location
+     *          The location where the task should be run at.
+     * @param ticks
+     *            The time to wait before running this task after the previous one.
+     * @param runnable
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRun(@Nonnull Location location, int ticks, @Nonnull Runnable runnable) {
+        return thenRun(location, ticks, i -> runnable.run());
     }
 
     /**
@@ -204,6 +276,28 @@ public class TaskQueue {
     /**
      * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
      * The task will be repeated for the given amount of iterations.
+     * Use the {@link Integer} parameter in your {@link IntConsumer} to determine the task's index.
+     *
+     * @param location
+     *          The location where the task should be run at.
+     * @param iterations
+     *            The amount of times to repeat this task
+     * @param consumer
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRepeat(@Nonnull Location location, int iterations, @Nonnull IntConsumer consumer) {
+        for (int i = 0; i < iterations; i++) {
+            append(new TaskNode(location, consumer, false));
+        }
+
+        return this;
+    }
+
+    /**
+     * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
+     * The task will be repeated for the given amount of iterations.
      * 
      * @param iterations
      *            The amount of times to repeat this task
@@ -214,6 +308,23 @@ public class TaskQueue {
      */
     public @Nonnull TaskQueue thenRepeat(int iterations, @Nonnull Runnable runnable) {
         return thenRepeat(iterations, i -> runnable.run());
+    }
+
+    /**
+     * This method will schedule the given Task with no delay and <strong>synchronously</strong>.
+     * The task will be repeated for the given amount of iterations.
+     *
+     * @param location
+     *         The location where the task should be run at.
+     * @param iterations
+     *            The amount of times to repeat this task
+     * @param runnable
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRepeat(@Nonnull Location location, int iterations, @Nonnull Runnable runnable) {
+        return thenRepeat(location, iterations, i -> runnable.run());
     }
 
     /**
@@ -280,6 +391,34 @@ public class TaskQueue {
     /**
      * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
      * The task will be repeated for the given amount of iterations.
+     * Use the {@link Integer} parameter in your {@link IntConsumer} to determine the task's index.
+     *
+     * @param location
+     *         The location where the task should be run at.
+     * @param ticks
+     *            The delay between executions (including the start delay)
+     * @param iterations
+     *            The amount of times to repeat this task
+     * @param consumer
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRepeatEvery(@Nonnull Location location, int ticks, int iterations, @Nonnull IntConsumer consumer) {
+        if (ticks < 1) {
+            throw new IllegalArgumentException("thenRepeatEvery() must be given a time that is greater than zero!");
+        }
+
+        for (int i = 0; i < iterations; i++) {
+            append(new TaskNode(location, consumer, ticks, false));
+        }
+
+        return this;
+    }
+
+    /**
+     * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
+     * The task will be repeated for the given amount of iterations.
      * 
      * @param ticks
      *            The delay between executions (including the start delay)
@@ -292,6 +431,25 @@ public class TaskQueue {
      */
     public @Nonnull TaskQueue thenRepeatEvery(int ticks, int iterations, @Nonnull Runnable runnable) {
         return thenRepeatEvery(ticks, iterations, i -> runnable.run());
+    }
+
+    /**
+     * This method will schedule the given Task with the given delay and <strong>synchronously</strong>.
+     * The task will be repeated for the given amount of iterations.
+     *
+     * @param location
+     *         The location where the task should be run at.
+     * @param ticks
+     *            The delay between executions (including the start delay)
+     * @param iterations
+     *            The amount of times to repeat this task
+     * @param runnable
+     *            The callback to run
+     *
+     * @return The current instance of {@link TaskQueue}
+     */
+    public @Nonnull TaskQueue thenRepeatEvery(@Nonnull Location location, int ticks, int iterations, @Nonnull Runnable runnable) {
+        return thenRepeatEvery(location, ticks, iterations, i -> runnable.run());
     }
 
     /**
@@ -355,12 +513,42 @@ public class TaskQueue {
      * This method will make the task run the given callback until eternity.
      * The task will be run with no delay and <strong>synchronously</strong>.
      * Do not add other tasks after calling this method.
+     *
+     * @param location
+     *          The location where the task should be run at.
+     * @param consumer
+     *            The callback to run
+     */
+    public void thenLoop(@Nonnull Location location, @Nonnull IntConsumer consumer) {
+        TaskNode node = new TaskNode(location, consumer, false);
+        node.setNextNode(node);
+        append(node);
+    }
+
+    /**
+     * This method will make the task run the given callback until eternity.
+     * The task will be run with no delay and <strong>synchronously</strong>.
+     * Do not add other tasks after calling this method.
      * 
      * @param runnable
      *            The callback to run
      */
     public void thenLoop(@Nonnull Runnable runnable) {
         thenLoop(i -> runnable.run());
+    }
+
+    /**
+     * This method will make the task run the given callback until eternity.
+     * The task will be run with no delay and <strong>synchronously</strong>.
+     * Do not add other tasks after calling this method.
+     *
+     * @param location
+     *         The location where the task should be run at.
+     * @param runnable
+     *            The callback to run
+     */
+    public void thenLoop(@Nonnull Location location, @Nonnull Runnable runnable) {
+        thenLoop(location, i -> runnable.run());
     }
 
     /**
@@ -413,6 +601,28 @@ public class TaskQueue {
      * This method will make the task run the given callback until eternity.
      * The task will be run with the given delay and <strong>synchronously</strong>.
      * Do not add other tasks after calling this method.
+     *
+     * @param location
+     *         The location where the task should be run at.
+     * @param ticks
+     *            The delay between executions (including the start delay)
+     * @param consumer
+     *            The callback to run
+     */
+    public void thenLoopEvery(@Nonnull Location location, int ticks, @Nonnull IntConsumer consumer) {
+        if (ticks < 1) {
+            throw new IllegalArgumentException("thenLoopEvery() must be given a time that is greater than zero!");
+        }
+
+        TaskNode node = new TaskNode(location, consumer, ticks, false);
+        node.setNextNode(node);
+        append(node);
+    }
+
+    /**
+     * This method will make the task run the given callback until eternity.
+     * The task will be run with the given delay and <strong>synchronously</strong>.
+     * Do not add other tasks after calling this method.
      * 
      * @param ticks
      *            The delay between executions (including the start delay)
@@ -421,6 +631,22 @@ public class TaskQueue {
      */
     public void thenLoopEvery(int ticks, @Nonnull Runnable runnable) {
         thenLoopEvery(ticks, i -> runnable.run());
+    }
+
+    /**
+     * This method will make the task run the given callback until eternity.
+     * The task will be run with the given delay and <strong>synchronously</strong>.
+     * Do not add other tasks after calling this method.
+     *
+     * @param location
+     *        The location where the task should be run at.
+     * @param ticks
+     *            The delay between executions (including the start delay)
+     * @param runnable
+     *            The callback to run
+     */
+    public void thenLoopEvery(@Nonnull Location location, int ticks, @Nonnull Runnable runnable) {
+        thenLoopEvery(location, ticks, i -> runnable.run());
     }
 
     /**

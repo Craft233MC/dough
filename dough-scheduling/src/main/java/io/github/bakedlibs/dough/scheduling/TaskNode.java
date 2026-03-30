@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Location;
 
 // TODO: Convert to Java 16 record
 class TaskNode {
@@ -14,14 +15,28 @@ class TaskNode {
     private final boolean asynchronous;
     private int delay = 0;
     private TaskNode nextNode;
+    private Location location = null;
 
     protected TaskNode(@Nonnull IntConsumer consumer, boolean async) {
         this.runnable = consumer;
         this.asynchronous = async;
     }
 
+    protected TaskNode(@Nonnull Location location, @Nonnull IntConsumer consumer, boolean async) {
+        this.runnable = consumer;
+        this.location = location;
+        this.asynchronous = async;
+    }
+
     protected TaskNode(@Nonnull IntConsumer consumer, int delay, boolean async) {
         this.runnable = consumer;
+        this.delay = delay;
+        this.asynchronous = async;
+    }
+
+    protected TaskNode(@Nonnull Location location, @Nonnull IntConsumer consumer, int delay, boolean async) {
+        this.runnable = consumer;
+        this.location = location;
         this.delay = delay;
         this.asynchronous = async;
     }
@@ -54,6 +69,10 @@ class TaskNode {
         Validate.isTrue(delay >= 0, "The delay cannot be negative.");
 
         this.delay = delay;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
 }
