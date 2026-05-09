@@ -320,6 +320,8 @@
             <groupId>com.tcoded</groupId>
             <artifactId>FoliaLib</artifactId>
             <version>0.5.1</version>
+
+            <optional>true</optional>
             <scope>compile</scope>
         </dependency>
     </dependencies>
